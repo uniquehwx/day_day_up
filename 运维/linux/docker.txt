@@ -1,0 +1,39 @@
+
+在docker 中创建centos   具体操作网页如下，我已经发布对应的docket进入到自己的hub上面
+
+
+
+ 启动命令   docker run -d -p 15001:22 --privileged=true --name centos7:2.0  sshd_centos7.4    init
+加上  winpty在windows上   winpty docker run -d --name centos7_1 -p 15000:22  --privileged=true uniquehwx/centos7:master  init
+
+ docker exec -it centos7 bin/bash
+
+https://www.cnblogs.com/caidingyu/p/10642158.html
+
+
+
+ 错误总结 ：Failed to get D-Bus connection: Operation not permitted   （在docker中创建centos再创建docker,权限问题）
+
+今天突发奇想：在我的阿里云服务器上跑一个docker，再用docker跑3个centos 7.6容器，这三个centos容器分别跑一个docker 用来回炉docker。
+
+似乎用原理上来讲不存在问题。于是我就开始做了。
+
+但是在我用阿里云上安装完docker-ce后，开始启动docker:
+
+systemctl start docker 似乎没啥错啊  
+
+但是问题来了：Failed to get D-Bus connection: Operation not permitted
+
+这个问题从字面意思是：无法获取D总线连接：不允许操作
+
+好像不应该啊，但一仔细想：原因可能是因为 docker容器中的 init是虚拟出来的，是由宿主机上的某一个进程伪造出来的，本质上讲还是输入宿主机上的那个进程的。
+
+似乎好像我想的没错了，但是上网一查：
+
+
+
+好像和我想的一样哈。
+
+既然问题想明白了，那就解决呗，就给它权限呗：docker run -tdi --privileged centos init 
+
+等了好长时间，终于可以进行了。
